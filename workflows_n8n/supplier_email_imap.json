@@ -1,0 +1,496 @@
+{
+  "name": "INSUR AI - Análisis PDF por Email (IMAP)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n**Credenciales a configurar:**\n- `IMAP Account` → buzón de entrada donde llegan los PDFs\n- `SMTP Account` → para enviar respuestas\n\n**Cómo enviar un PDF para análisis:**\nEnvía un email con:\n- Asunto que contenga: `ANALIZAR` (o ajusta el filtro en el trigger)\n- Adjunto: el PDF del informe de proveedores\n\n**Variable de entorno:**\n- `BACKEND_URL` = `http://insur-backend:8000`",
+        "height": 220,
+        "width": 420,
+        "color": 5
+      },
+      "id": "sticky-setup",
+      "name": "Nota - Configuración Email",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-240, 40]
+    },
+    {
+      "parameters": {
+        "content": "## 📥 Trigger Email\nEscucha el buzón IMAP cada 5 minutos.\nFiltro: emails con adjunto PDF cuyo asunto contenga `ANALIZAR`.\n\nEl adjunto binario se pasa directamente a `POST /extract`.",
+        "height": 140,
+        "width": 340,
+        "color": 6
+      },
+      "id": "sticky-trigger",
+      "name": "Nota - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 40]
+    },
+    {
+      "parameters": {
+        "content": "## 📊 Pipeline ML\n1. `/extract` → texto + tablas del PDF\n2. `/ml/full` → segmentación, comportamiento, forecast\n3. `/generate-prd` → PRD completo vía Claude",
+        "height": 140,
+        "width": 540,
+        "color": 3
+      },
+      "id": "sticky-pipeline",
+      "name": "Nota - Pipeline",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [380, 40]
+    },
+    {
+      "parameters": {
+        "content": "## 📤 Respuesta por Email\n**HIGH risk** → email urgente al equipo de riesgo\n**MED / LOW** → email informe al remitente original",
+        "height": 120,
+        "width": 340,
+        "color": 4
+      },
+      "id": "sticky-output",
+      "name": "Nota - Output",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [960, 40]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinutes",
+              "value": 5
+            }
+          ]
+        },
+        "mailbox": "INBOX",
+        "options": {
+          "allowUnauthorizedCerts": false,
+          "downloadAttachments": true,
+          "dataPropertyAttachmentsPrefixName": "attachment_"
+        }
+      },
+      "id": "email-trigger",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "credentials": {
+        "imap": {
+          "id": "imap-creds",
+          "name": "IMAP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-subject",
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "ANALIZAR",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid-email",
+      "name": "IF - Email Válido",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-sender",
+              "name": "sender_email",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-sender-name",
+              "name": "sender_name",
+              "value": "={{ $json.from.value[0].name || $json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-subject",
+              "name": "original_subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-date",
+              "name": "received_at",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-email-meta",
+      "name": "Set - Metadatos Email",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/extract",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "attachment_0"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-extract",
+      "name": "POST - Extract PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/ml/full",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ full_text: $json.extraction.full_text, horizon_days: 90 }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-ml-full",
+      "name": "POST - ML Full Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/generate-prd",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ ...JSON.parse(JSON.stringify($json)), extraction: { full_text: $node[\"POST - Extract PDF\"].json.extraction.full_text } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-generate-prd",
+      "name": "POST - Generate PRD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 360]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-prd",
+              "name": "prd_text",
+              "value": "={{ $json.prd_text }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-run",
+              "name": "run_id",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-high",
+              "name": "high_risk_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.segmentation.output.summary.high_risk }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-total",
+              "name": "total_suppliers",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.segmentation.output.summary.total_suppliers }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-med",
+              "name": "med_risk_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.segmentation.output.summary.med_risk }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-alerts",
+              "name": "risk_alerts_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.decisions.risk_alerts.length }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-sender",
+              "name": "sender_email",
+              "value": "={{ $node[\"Set - Metadatos Email\"].json.sender_email }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-sender-name",
+              "name": "sender_name",
+              "value": "={{ $node[\"Set - Metadatos Email\"].json.sender_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-summary",
+      "name": "Set - Resumen Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [1200, 360]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-high",
+              "leftValue": "={{ $json.high_risk_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "if-high-risk",
+      "name": "IF - Alto Riesgo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1440, 360]
+    },
+    {
+      "parameters": {
+        "fromEmail": "insur-ai@company.com",
+        "toEmail": "={{ $env.RISK_TEAM_EMAIL || 'riesgo@company.com' }}",
+        "ccEmail": "={{ $json.sender_email }}",
+        "subject": "🚨 [URGENTE] INSUR AI — {{ $json.high_risk_count }} proveedores ALTO RIESGO (run: {{ $json.run_id }})",
+        "emailType": "html",
+        "message": "<h2 style='color:#dc2626;font-family:sans-serif'>🚨 Alerta de Riesgo Alto — INSUR AI</h2>\n<p style='font-family:sans-serif'><strong>Solicitado por:</strong> {{ $json.sender_name }} ({{ $json.sender_email }})</p>\n<table style='border-collapse:collapse;font-family:sans-serif;margin-bottom:16px'>\n  <tr><td style='padding:8px 16px;background:#fef2f2;border:1px solid #fca5a5'><strong>🔴 Alto riesgo</strong></td><td style='padding:8px 16px;border:1px solid #fca5a5'>{{ $json.high_risk_count }}</td></tr>\n  <tr><td style='padding:8px 16px;background:#fffbeb;border:1px solid #fcd34d'><strong>🟡 Riesgo medio</strong></td><td style='padding:8px 16px;border:1px solid #fcd34d'>{{ $json.med_risk_count }}</td></tr>\n  <tr><td style='padding:8px 16px;background:#f0fdf4;border:1px solid #86efac'><strong>✅ Total analizados</strong></td><td style='padding:8px 16px;border:1px solid #86efac'>{{ $json.total_suppliers }}</td></tr>\n  <tr><td style='padding:8px 16px;background:#fff;border:1px solid #e2e8f0'><strong>⚠️ Alertas activas</strong></td><td style='padding:8px 16px;border:1px solid #e2e8f0'>{{ $json.risk_alerts_count }}</td></tr>\n</table>\n<hr>\n<h3 style='font-family:sans-serif'>📄 PRD Generado (run: {{ $json.run_id }})</h3>\n<pre style='background:#f1f5f9;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px'>{{ $json.prd_text }}</pre>",
+        "options": {}
+      },
+      "id": "email-urgent",
+      "name": "Email - Alerta Urgente",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1680, 220],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "insur-ai@company.com",
+        "toEmail": "={{ $json.sender_email }}",
+        "subject": "✅ INSUR AI — Análisis completado: {{ $json.total_suppliers }} proveedores analizados (run: {{ $json.run_id }})",
+        "emailType": "html",
+        "message": "<h2 style='color:#0f172a;font-family:sans-serif'>📋 Informe de Análisis de Proveedores — INSUR AI</h2>\n<p style='font-family:sans-serif'>Hola {{ $json.sender_name }},</p>\n<p style='font-family:sans-serif'>Aquí tienes los resultados del análisis de tu documento PDF de proveedores.</p>\n<table style='border-collapse:collapse;font-family:sans-serif;margin-bottom:16px'>\n  <tr><td style='padding:8px 16px;background:#fef2f2;border:1px solid #fca5a5'><strong>🔴 Alto riesgo</strong></td><td style='padding:8px 16px;border:1px solid #fca5a5'>{{ $json.high_risk_count }}</td></tr>\n  <tr><td style='padding:8px 16px;background:#fffbeb;border:1px solid #fcd34d'><strong>🟡 Riesgo medio</strong></td><td style='padding:8px 16px;border:1px solid #fcd34d'>{{ $json.med_risk_count }}</td></tr>\n  <tr><td style='padding:8px 16px;background:#f0fdf4;border:1px solid #86efac'><strong>✅ Total analizados</strong></td><td style='padding:8px 16px;border:1px solid #86efac'>{{ $json.total_suppliers }}</td></tr>\n</table>\n<hr>\n<h3 style='font-family:sans-serif'>📄 PRD Completo</h3>\n<pre style='background:#f1f5f9;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px'>{{ $json.prd_text }}</pre>\n<hr>\n<p style='font-family:sans-serif;color:#64748b;font-size:12px'>Generado por INSUR AI · Run ID: {{ $json.run_id }}</p>",
+        "options": {}
+      },
+      "id": "email-report",
+      "name": "Email - Informe al Remitente",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1680, 500],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "insur-ai@company.com",
+        "toEmail": "={{ $node[\"Email Trigger (IMAP)\"].json.from.value[0].address }}",
+        "subject": "RE: {{ $node[\"Email Trigger (IMAP)\"].json.subject }} — Email sin adjunto PDF válido",
+        "emailType": "text",
+        "message": "Hola,\n\nHemos recibido tu solicitud de análisis, pero no encontramos un archivo PDF adjunto.\n\nPor favor reenvía el email con el PDF del informe de proveedores adjunto y el asunto debe contener la palabra ANALIZAR.\n\nGracias,\nINSUR AI",
+        "options": {}
+      },
+      "id": "email-no-pdf",
+      "name": "Email - Sin PDF Adjunto",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [480, 520],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "IF - Email Válido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Email Válido": {
+      "main": [
+        [
+          {
+            "node": "Set - Metadatos Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "POST - Extract PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Sin PDF Adjunto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - Extract PDF": {
+      "main": [
+        [
+          {
+            "node": "POST - ML Full Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - ML Full Analysis": {
+      "main": [
+        [
+          {
+            "node": "POST - Generate PRD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - Generate PRD": {
+      "main": [
+        [
+          {
+            "node": "Set - Resumen Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Resumen Resultado": {
+      "main": [
+        [
+          {
+            "node": "IF - Alto Riesgo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Alto Riesgo": {
+      "main": [
+        [
+          {
+            "node": "Email - Alerta Urgente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Informe al Remitente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "insur-email-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "insur-ai-app"
+  },
+  "id": "insur-supplier-email-pipeline",
+  "tags": [
+    { "id": "tag-insur", "name": "insur-ai" },
+    { "id": "tag-email", "name": "email-trigger" },
+    { "id": "tag-risk", "name": "risk-analysis" }
+  ]
+}

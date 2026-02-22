@@ -1,0 +1,29 @@
+project_id,project_name,city,region,zone,launch_date,completion_date,units_total,base_eur_m2,sustainability_index,complexity_index,asset_type
+PRJ_0001,Project_0001,Madrid,Comunidad de Madrid,Arganzuela,2021-08-14,2023-05-14,67,4595.14,0.65,0.839,build_to_rent
+PRJ_0002,Project_0002,Sevilla,Andalucia,Los Remedios,2023-09-25,2025-04-25,46,2855.62,0.618,1.0,residencial
+PRJ_0003,Project_0003,Sevilla,Andalucia,Los Remedios,2023-12-24,2025-08-24,67,2604.04,0.485,0.523,residencial
+PRJ_0004,Project_0004,Valencia,Comunitat Valenciana,Campanar,2024-11-13,2026-08-13,127,2909.88,0.349,0.242,residencial
+PRJ_0005,Project_0005,Valencia,Comunitat Valenciana,Ruzafa,2022-04-21,2023-02-21,70,2964.62,0.592,0.014,build_to_rent
+PRJ_0006,Project_0006,Malaga,Andalucia,Carretera de Cadiz,2022-06-25,2023-06-25,122,3743.18,0.495,0.494,residencial
+PRJ_0007,Project_0007,Madrid,Comunidad de Madrid,Las Tablas,2022-11-17,2024-01-17,82,4348.99,0.617,0.277,residencial
+PRJ_0008,Project_0008,Sevilla,Andalucia,Nervion,2021-10-04,2022-10-04,102,3060.19,0.583,0.357,residencial
+PRJ_0009,Project_0009,Barcelona,Cataluna,Les Corts,2021-07-09,2023-01-09,78,4346.19,0.836,0.318,build_to_rent
+PRJ_0010,Project_0010,Madrid,Comunidad de Madrid,Las Tablas,2022-11-26,2024-10-26,60,4354.54,0.542,0.412,build_to_rent
+PRJ_0011,Project_0011,Valencia,Comunitat Valenciana,Campanar,2021-11-28,2023-10-28,108,3360.15,0.416,0.653,mixto
+PRJ_0012,Project_0012,Malaga,Andalucia,El Limonar,2023-09-05,2025-04-05,128,3510.91,0.609,0.471,build_to_rent
+PRJ_0013,Project_0013,Sevilla,Andalucia,Nervion,2022-10-01,2025-01-01,60,3005.97,0.615,0.408,build_to_rent
+PRJ_0014,Project_0014,Sevilla,Andalucia,Sevilla Este,2024-04-30,2026-01-30,109,2746.43,0.797,0.233,residencial
+PRJ_0015,Project_0015,Sevilla,Andalucia,Sevilla Este,2023-10-20,2024-09-20,60,2815.77,0.714,0.105,residencial
+PRJ_0016,Project_0016,Sevilla,Andalucia,Triana,2022-04-02,2024-05-02,103,2811.44,0.637,0.343,mixto
+PRJ_0017,Project_0017,Valencia,Comunitat Valenciana,Ruzafa,2024-04-30,2026-01-30,110,2893.87,0.814,0.429,residencial
+PRJ_0018,Project_0018,Madrid,Comunidad de Madrid,Las Tablas,2024-03-20,2026-01-20,78,4467.52,0.39,0.794,residencial
+PRJ_0019,Project_0019,Malaga,Andalucia,Carretera de Cadiz,2022-07-20,2024-04-20,105,3464.81,0.478,0.466,residencial
+PRJ_0020,Project_0020,Valencia,Comunitat Valenciana,Quatre Carreres,2022-02-25,2023-11-25,61,3203.2,0.432,0.637,mixto
+PRJ_0021,Project_0021,Valencia,Comunitat Valenciana,Benimaclet,2023-09-24,2024-08-24,42,3323.07,0.518,0.34,residencial
+PRJ_0022,Project_0022,Barcelona,Cataluna,Gracia,2021-07-24,2023-04-24,44,4660.75,0.36,0.203,build_to_rent
+PRJ_0023,Project_0023,Madrid,Comunidad de Madrid,Carabanchel,2021-10-19,2023-11-19,77,4528.89,0.682,0.247,residencial
+PRJ_0024,Project_0024,Malaga,Andalucia,Teatinos,2021-01-11,2022-05-11,121,3571.64,0.544,0.295,residencial
+PRJ_0025,Project_0025,Sevilla,Andalucia,Triana,2024-02-23,2025-12-23,47,2801.79,0.345,0.866,mixto
+PRJ_0026,Project_0026,Sevilla,Andalucia,Los Remedios,2023-08-29,2024-06-29,78,2881.51,0.418,0.276,residencial
+PRJ_0027,Project_0027,Valencia,Comunitat Valenciana,Patraix,2023-10-27,2025-02-27,102,2768.04,0.63,0.608,residencial
+PRJ_0028,Project_0028,Malaga,Andalucia,Teatinos,2024-02-14,2025-08-14,54,3183.23,0.714,0.259,residencial

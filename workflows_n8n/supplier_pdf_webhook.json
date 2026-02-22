@@ -1,0 +1,404 @@
+{
+  "name": "INSUR AI - Análisis PDF Proveedores (Webhook)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n**Credenciales a configurar:**\n- `SMTP Account` → ajusta en nodo \"Email - Informe\"\n- `Slack Webhook URL` → ajusta en nodo \"Slack - Alerta Urgente\"\n\n**Variable de entorno:**\n- `BACKEND_URL` = `http://insur-backend:8000` (Docker) o `http://localhost:8000` (local)\n\n**Trigger:**\nEnvía un POST multipart/form-data con campo `file` (PDF) a:\n`POST {{ $env.WEBHOOK_URL }}/webhook/insur-pdf-analysis`",
+        "height": 200,
+        "width": 420,
+        "color": 5
+      },
+      "id": "sticky-setup",
+      "name": "Nota - Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-240, 60]
+    },
+    {
+      "parameters": {
+        "content": "## 1️⃣ Extracción + Normalización\n`POST /extract` → texto bruto + tablas del PDF\n`POST /ml/full` → segmentación, comportamiento, forecast y decisiones\n`POST /generate-prd` → PRD generado por Claude",
+        "height": 120,
+        "width": 720,
+        "color": 3
+      },
+      "id": "sticky-pipeline",
+      "name": "Nota - Pipeline ML",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 60]
+    },
+    {
+      "parameters": {
+        "content": "## 2️⃣ Routing por Riesgo\n**HIGH** → Slack urgente + Email prioritario\n**MED / LOW** → Email informe estándar",
+        "height": 120,
+        "width": 340,
+        "color": 4
+      },
+      "id": "sticky-routing",
+      "name": "Nota - Routing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [960, 60]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "insur-pdf-analysis",
+        "responseMode": "lastNode",
+        "options": {
+          "binaryData": true
+        }
+      },
+      "id": "webhook-node",
+      "name": "Webhook - Recibir PDF",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "insur-pdf-analysis"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/extract",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-extract",
+      "name": "POST - Extract PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/ml/full",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ full_text: $json.extraction.full_text, horizon_days: 90 }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-ml-full",
+      "name": "POST - ML Full Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://insur-backend:8000' }}/generate-prd",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ ...JSON.parse(JSON.stringify($json)), extraction: { full_text: $node[\"POST - Extract PDF\"].json.extraction.full_text } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-generate-prd",
+      "name": "POST - Generate PRD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-prd",
+              "name": "prd_text",
+              "value": "={{ $json.prd_text }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-run",
+              "name": "run_id",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-high",
+              "name": "high_risk_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.segmentation.output.summary.high_risk }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-total",
+              "name": "total_suppliers",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.segmentation.output.summary.total_suppliers }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-alerts",
+              "name": "risk_alerts_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.decisions.risk_alerts.length }}",
+              "type": "number"
+            },
+            {
+              "id": "assign-decisions",
+              "name": "strategic_decisions_count",
+              "value": "={{ $node[\"POST - ML Full Analysis\"].json.decisions.strategic_decisions.length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-summary",
+      "name": "Set - Resumen Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-high-risk",
+              "leftValue": "={{ $json.high_risk_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "if-high-risk",
+      "name": "IF - Alto Riesgo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ text: \"🚨 *ALERTA - Proveedores ALTO RIESGO detectados*\", blocks: [ { type: \"header\", text: { type: \"plain_text\", text: \"🚨 INSUR AI - Alerta Riesgo Alto\" } }, { type: \"section\", fields: [ { type: \"mrkdwn\", text: \"*Proveedores HIGH:*\\n\" + $json.high_risk_count }, { type: \"mrkdwn\", text: \"*Total analizados:*\\n\" + $json.total_suppliers }, { type: \"mrkdwn\", text: \"*Alertas activas:*\\n\" + $json.risk_alerts_count }, { type: \"mrkdwn\", text: \"*Decisiones:*\\n\" + $json.strategic_decisions_count } ] }, { type: \"section\", text: { type: \"mrkdwn\", text: \"*Run ID:* \" + $json.run_id + \"\\n\\nEl PRD completo ha sido enviado al equipo de riesgo.\" } } ] }) }}"
+      },
+      "id": "http-slack-urgent",
+      "name": "Slack - Alerta Urgente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1440, 160]
+    },
+    {
+      "parameters": {
+        "fromEmail": "insur-ai@company.com",
+        "toEmail": "={{ $env.RISK_TEAM_EMAIL || 'riesgo@company.com' }}",
+        "subject": "🚨 [URGENTE] INSUR AI — Proveedores Alto Riesgo Detectados (run: {{ $json.run_id }})",
+        "emailType": "html",
+        "message": "<h2 style='color:#dc2626'>🚨 Alerta de Riesgo Alto — INSUR AI</h2>\n<p><strong>Proveedores HIGH risk:</strong> {{ $json.high_risk_count }}<br>\n<strong>Total analizados:</strong> {{ $json.total_suppliers }}<br>\n<strong>Alertas activas:</strong> {{ $json.risk_alerts_count }}<br>\n<strong>Run ID:</strong> {{ $json.run_id }}</p>\n<hr>\n<h3>PRD Generado</h3>\n<pre style='background:#f1f5f9;padding:16px;border-radius:8px;white-space:pre-wrap'>{{ $json.prd_text }}</pre>",
+        "options": {}
+      },
+      "id": "email-urgent",
+      "name": "Email - Alerta Urgente",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1680, 160],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "insur-ai@company.com",
+        "toEmail": "={{ $env.REPORT_EMAIL || 'informes@company.com' }}",
+        "subject": "INSUR AI — Informe Análisis Proveedores (run: {{ $json.run_id }})",
+        "emailType": "html",
+        "message": "<h2 style='color:#0f172a'>📋 Informe de Análisis — INSUR AI</h2>\n<p><strong>Proveedores analizados:</strong> {{ $json.total_suppliers }}<br>\n<strong>High risk:</strong> {{ $json.high_risk_count }}<br>\n<strong>Run ID:</strong> {{ $json.run_id }}</p>\n<hr>\n<h3>PRD Generado</h3>\n<pre style='background:#f1f5f9;padding:16px;border-radius:8px;white-space:pre-wrap'>{{ $json.prd_text }}</pre>",
+        "options": {}
+      },
+      "id": "email-report",
+      "name": "Email - Informe Estándar",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1440, 440],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'ok', run_id: $node['Set - Resumen Resultado'].json.run_id, high_risk_count: $node['Set - Resumen Resultado'].json.high_risk_count, prd_generated: true }) }}"
+      },
+      "id": "webhook-response",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1680, 440]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Recibir PDF": {
+      "main": [
+        [
+          {
+            "node": "POST - Extract PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - Extract PDF": {
+      "main": [
+        [
+          {
+            "node": "POST - ML Full Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - ML Full Analysis": {
+      "main": [
+        [
+          {
+            "node": "POST - Generate PRD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST - Generate PRD": {
+      "main": [
+        [
+          {
+            "node": "Set - Resumen Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Resumen Resultado": {
+      "main": [
+        [
+          {
+            "node": "IF - Alto Riesgo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Alto Riesgo": {
+      "main": [
+        [
+          {
+            "node": "Slack - Alerta Urgente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Informe Estándar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Alerta Urgente": {
+      "main": [
+        [
+          {
+            "node": "Email - Alerta Urgente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Alerta Urgente": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Informe Estándar": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "insur-webhook-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "insur-ai-app"
+  },
+  "id": "insur-supplier-webhook-pipeline",
+  "tags": [
+    { "id": "tag-insur", "name": "insur-ai" },
+    { "id": "tag-suppliers", "name": "suppliers" },
+    { "id": "tag-risk", "name": "risk-analysis" }
+  ]
+}

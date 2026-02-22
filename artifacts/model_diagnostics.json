@@ -1,0 +1,346 @@
+{
+  "generated_at_utc": "2026-02-21T15:15:03.640992+00:00",
+  "domain": "all",
+  "suppliers": {
+    "segmentation": {
+      "accuracy": 0.8939,
+      "f1_weighted": 0.8906,
+      "cv_f1_weighted_mean": 0.9003,
+      "cv_f1_weighted_std": 0.0079,
+      "diagnostics": {
+        "feature_importance_top": [
+          {
+            "feature": "avg_delay_days",
+            "importance": 0.242948
+          },
+          {
+            "feature": "incidents",
+            "importance": 0.199569
+          },
+          {
+            "feature": "dependency_pct",
+            "importance": 0.189846
+          },
+          {
+            "feature": "estimated_margin_pct",
+            "importance": 0.125498
+          },
+          {
+            "feature": "orders",
+            "importance": 0.063965
+          },
+          {
+            "feature": "annual_volume_eur",
+            "importance": 0.05745
+          },
+          {
+            "feature": "category",
+            "importance": 0.051039
+          },
+          {
+            "feature": "macro_pressure",
+            "importance": 0.035624
+          },
+          {
+            "feature": "demand_pressure",
+            "importance": 0.034061
+          }
+        ],
+        "label_distribution": {
+          "LOW": 2376,
+          "MED": 990,
+          "HIGH": 594
+        }
+      }
+    },
+    "behavior": {
+      "accuracy": 0.8157,
+      "f1_weighted": 0.813,
+      "cv_f1_weighted_mean": 0.8084,
+      "cv_f1_weighted_std": 0.0067,
+      "diagnostics": {
+        "feature_importance_top": [
+          {
+            "feature": "avg_delay_days",
+            "importance": 0.232556
+          },
+          {
+            "feature": "incidents",
+            "importance": 0.217488
+          },
+          {
+            "feature": "dependency_pct",
+            "importance": 0.173321
+          },
+          {
+            "feature": "estimated_margin_pct",
+            "importance": 0.101403
+          },
+          {
+            "feature": "annual_volume_eur",
+            "importance": 0.070931
+          },
+          {
+            "feature": "orders",
+            "importance": 0.070689
+          },
+          {
+            "feature": "category",
+            "importance": 0.053304
+          },
+          {
+            "feature": "macro_pressure",
+            "importance": 0.04087
+          },
+          {
+            "feature": "demand_pressure",
+            "importance": 0.039436
+          }
+        ],
+        "label_distribution": {
+          "critical": 1693,
+          "warning": 1660,
+          "stable": 607
+        }
+      }
+    },
+    "forecast": {
+      "mae": 6.2211,
+      "r2": 0.9522,
+      "cv_r2_mean": 0.9511,
+      "cv_r2_std": 0.0031,
+      "diagnostics": {
+        "feature_importance_top": [
+          {
+            "feature": "avg_delay_days",
+            "importance": 0.47616
+          },
+          {
+            "feature": "incidents",
+            "importance": 0.29162
+          },
+          {
+            "feature": "dependency_pct",
+            "importance": 0.160358
+          },
+          {
+            "feature": "estimated_margin_pct",
+            "importance": 0.050067
+          },
+          {
+            "feature": "annual_volume_eur",
+            "importance": 0.005325
+          },
+          {
+            "feature": "orders",
+            "importance": 0.005177
+          },
+          {
+            "feature": "macro_pressure",
+            "importance": 0.00394
+          },
+          {
+            "feature": "category",
+            "importance": 0.003745
+          },
+          {
+            "feature": "demand_pressure",
+            "importance": 0.00361
+          }
+        ],
+        "residual_std": 7.789356,
+        "mae": 6.221087,
+        "residual_p10": -10.330117,
+        "residual_p50": -0.574017,
+        "residual_p90": 9.38107
+      }
+    },
+    "dataset": {
+      "rows": 3960,
+      "dataset_path": "data\\raw\\proveedores_riesgo_snapshots.csv",
+      "features": [
+        "category",
+        "annual_volume_eur",
+        "orders",
+        "incidents",
+        "avg_delay_days",
+        "dependency_pct",
+        "estimated_margin_pct",
+        "macro_pressure",
+        "demand_pressure"
+      ]
+    }
+  },
+  "real_estate": {
+    "sale_price": {
+      "mae": 19256.56,
+      "r2": 0.9629,
+      "cv_r2_mean": 0.9637,
+      "cv_r2_std": 0.0038,
+      "diagnostics": {
+        "feature_importance_top": [
+          {
+            "feature": "sqm",
+            "importance": 0.692947
+          },
+          {
+            "feature": "base_eur_m2",
+            "importance": 0.27571
+          },
+          {
+            "feature": "sale_price_eur_m2_city",
+            "importance": 0.004442
+          },
+          {
+            "feature": "floor",
+            "importance": 0.003442
+          },
+          {
+            "feature": "rent_price_eur_m2_month_city",
+            "importance": 0.003428
+          },
+          {
+            "feature": "city",
+            "importance": 0.002668
+          },
+          {
+            "feature": "demand_index_city",
+            "importance": 0.002084
+          },
+          {
+            "feature": "inflation_yoy_pct",
+            "importance": 0.002
+          },
+          {
+            "feature": "euribor_12m_pct",
+            "importance": 0.001973
+          },
+          {
+            "feature": "energy",
+            "importance": 0.001797
+          },
+          {
+            "feature": "inventory_index",
+            "importance": 0.001705
+          },
+          {
+            "feature": "absorption_units_month",
+            "importance": 0.00145
+          }
+        ],
+        "residual_std": 24873.265909,
+        "mae": 19256.555727,
+        "residual_p10": -28640.522087,
+        "residual_p50": 786.3367,
+        "residual_p90": 31601.13494
+      }
+    },
+    "rent": {
+      "mae": 235.42,
+      "r2": 0.756,
+      "cv_r2_mean": 0.7678,
+      "cv_r2_std": 0.0094,
+      "diagnostics": {
+        "feature_importance_top": [
+          {
+            "feature": "sqm",
+            "importance": 0.628219
+          },
+          {
+            "feature": "base_eur_m2",
+            "importance": 0.210239
+          },
+          {
+            "feature": "floor",
+            "importance": 0.020355
+          },
+          {
+            "feature": "rent_price_eur_m2_month_city",
+            "importance": 0.020052
+          },
+          {
+            "feature": "sale_price_eur_m2_city",
+            "importance": 0.016472
+          },
+          {
+            "feature": "euribor_12m_pct",
+            "importance": 0.012344
+          },
+          {
+            "feature": "demand_index_city",
+            "importance": 0.012134
+          },
+          {
+            "feature": "inflation_yoy_pct",
+            "importance": 0.011651
+          },
+          {
+            "feature": "energy",
+            "importance": 0.011482
+          },
+          {
+            "feature": "absorption_units_month",
+            "importance": 0.009879
+          },
+          {
+            "feature": "inventory_index",
+            "importance": 0.009492
+          },
+          {
+            "feature": "sustainability_index",
+            "importance": 0.006225
+          }
+        ],
+        "residual_std": 304.636868,
+        "mae": 235.418628,
+        "residual_p10": -380.945133,
+        "residual_p50": -4.0233,
+        "residual_p90": 381.07002
+      }
+    },
+    "investment_score": {
+      "method": "derived_from_rent_sale_ratio",
+      "note": "score = clip(predicted_rent*12/predicted_sale/0.08, 0, 1)*100. No se entrena modelo separado."
+    },
+    "liquidity": {
+      "mae_days": 79.09,
+      "r2": 0.5042,
+      "cv_r2_mean": 0.5324,
+      "cv_r2_std": 0.0376,
+      "diagnostics": {
+        "feature_importance_top": [],
+        "residual_std": 108.59628,
+        "mae": 79.090775,
+        "residual_p10": -171.920309,
+        "residual_p50": 12.397258,
+        "residual_p90": 124.254782
+      }
+    },
+    "dataset": {
+      "rows": 2274,
+      "features": [
+        "sqm",
+        "bedrooms",
+        "floor",
+        "has_terrace",
+        "has_garage",
+        "has_storage",
+        "base_eur_m2",
+        "sustainability_index",
+        "complexity_index",
+        "sale_price_eur_m2_city",
+        "rent_price_eur_m2_month_city",
+        "demand_index_city",
+        "absorption_units_month",
+        "inventory_index",
+        "euribor_12m_pct",
+        "inflation_yoy_pct",
+        "city",
+        "zone",
+        "asset_type",
+        "energy_rating"
+      ],
+      "raw_dir": "data\\raw"
+    }
+  }
+}

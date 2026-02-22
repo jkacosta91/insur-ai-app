@@ -1,0 +1,29 @@
+# Entornos virtuales
+.venv/
+venv/
+
+# Variables sensibles
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs / outputs
+*.log
+*.pdf
+
+# Modelos / artefactos pesados
+models/
+*.pkl
+*.joblib
+
+# VSCode / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/

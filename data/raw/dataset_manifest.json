@@ -1,0 +1,46 @@
+{
+  "generated_at_utc": "2026-02-20T18:20:48.795987+00:00",
+  "domain": "all",
+  "files": [
+    {
+      "name": "proveedores_riesgo_snapshots.csv",
+      "rows": 3960
+    },
+    {
+      "name": "inmobiliario_proyectos.csv",
+      "rows": 28
+    },
+    {
+      "name": "inmobiliario_unidades.csv",
+      "rows": 2308
+    },
+    {
+      "name": "inmobiliario_macro_mensual.csv",
+      "rows": 60
+    },
+    {
+      "name": "inmobiliario_mercado_mensual.csv",
+      "rows": 300
+    },
+    {
+      "name": "inmobiliario_clientes.csv",
+      "rows": 6500
+    },
+    {
+      "name": "inmobiliario_leads.csv",
+      "rows": 10400
+    },
+    {
+      "name": "inmobiliario_reservas.csv",
+      "rows": 2308
+    },
+    {
+      "name": "inmobiliario_transacciones.csv",
+      "rows": 2274
+    },
+    {
+      "name": "inmobiliario_activos_legales.csv",
+      "rows": 2308
+    }
+  ]
+}

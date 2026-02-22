@@ -1,0 +1,35 @@
+services:
+  frontend:
+    image: python:3.12-slim
+    container_name: insur-frontend
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && python -m streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0"
+    environment:
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/${N8N_WEBHOOK_PATH:-insur-multiagente}
+      - N8N_STRICT_DECISIONS=${N8N_STRICT_DECISIONS:-true}
+    ports:
+      - "8501:8501"
+    depends_on:
+      - n8n
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: insur-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=Europe/Madrid
+      - WEBHOOK_URL=http://localhost:5678/
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${N8N_OPENAI_MODEL:-gpt-4.1}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows_n8n:/workflows_n8n
+
+volumes:
+  n8n_data:

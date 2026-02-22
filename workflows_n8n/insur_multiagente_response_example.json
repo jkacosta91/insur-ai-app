@@ -1,0 +1,90 @@
+﻿{
+  "status": "success",
+  "session_id": "INS-EXAMPLE-001",
+  "filename": "Informe_Promocion.pdf",
+  "tipo_documento": "promotora",
+  "confianza_tipo": 0.92,
+  "zona_geografica": "Sevilla",
+  "ccaa": "Andalucia",
+  "datos_extraidos": {
+    "precio_m2": 3250,
+    "num_unidades": 84,
+    "coste_construccion_m2": 1220,
+    "plazo_meses": 18,
+    "roi_declarado_pct": 9.1
+  },
+  "data_scientist": {
+    "score_riesgo": 41,
+    "score_rentabilidad": 73,
+    "score_absorcion": 70,
+    "score_global": 71,
+    "desviacion_precio_pct": 3.8,
+    "benchmark_precio_zona": 3130,
+    "ventas_proyectadas_3m": 14,
+    "ventas_proyectadas_6m": 30,
+    "ventas_proyectadas_12m": 58,
+    "roi_estimado_pct": 9.1,
+    "variacion_yoy_zona_pct": 8.4,
+    "alertas_cuantitativas": [],
+    "conclusiones": [
+      "El precio esta en rango de mercado para la zona.",
+      "La absorcion estimada es razonable para 12 meses."
+    ]
+  },
+  "analista_financiero": {
+    "valoracion_financiera": "BUENA",
+    "score_viabilidad": 77,
+    "ratios_clave": [],
+    "fortalezas": [
+      "ROI por encima del benchmark de zona"
+    ],
+    "debilidades": [
+      "Dependencia de hipoteca promotora"
+    ],
+    "conclusion_financiera": "Operacion viable con seguimiento de caja trimestral."
+  },
+  "analista_mercado": {
+    "posicionamiento_mercado": "FAVORABLE",
+    "tendencia_zona": "ALCISTA",
+    "ventana_lanzamiento": {
+      "meses_optimos": ["Febrero", "Marzo", "Abril"],
+      "meses_evitar": ["Agosto"],
+      "justificacion": "Pico de demanda en Q1-Q2"
+    },
+    "oportunidades": ["Demanda activa en segmento residencial"],
+    "amenazas": ["Subida de tipos y coste de financiacion"],
+    "conclusion_mercado": "Mercado favorable con riesgo macro moderado."
+  },
+  "informe_ejecutivo": {
+    "score_oportunidad_global": 74,
+    "recomendacion_global": "INVERTIR",
+    "resumen_ejecutivo": "La operacion presenta un perfil de oportunidad favorable con riesgo controlado.",
+    "decisiones": [
+      {
+        "urgencia": "ALTA",
+        "titulo": "Cerrar presupuesto de obra con clausulas de control",
+        "descripcion": "Fijar costes maximos por partida para proteger margen.",
+        "impacto": "Reduce desviacion potencial de margen bruto.",
+        "confianza": 86
+      },
+      {
+        "urgencia": "MEDIA",
+        "titulo": "Priorizar lanzamiento en ventana Q1-Q2",
+        "descripcion": "Activar campanas antes del pico estacional de demanda.",
+        "impacto": "Mejora velocidad de absorcion.",
+        "confianza": 81
+      }
+    ],
+    "matriz_riesgo": {
+      "riesgo_precio": "BAJO",
+      "riesgo_absorcion": "MEDIO",
+      "riesgo_financiero": "MEDIO",
+      "riesgo_mercado": "BAJO"
+    },
+    "proximos_pasos": [
+      "Validar hipotesis de ventas por segmento",
+      "Aprobar plan comercial de lanzamiento",
+      "Definir comite mensual de riesgos"
+    ]
+  }
+}
