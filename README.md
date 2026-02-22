@@ -22,7 +22,7 @@ El valor del sistema depende de la consistencia estructurada del JSON devuelto p
 
 ## WORKFLOW N8N
 
-![Arquitectura](docs/images/workflow_n8n.jpeg)
+![Arquitectura](docs/images/worflow%20n8n.jpeg)
 
 Flujos soportados:
 
@@ -40,23 +40,21 @@ Frontend/n8n -> FastAPI `/ml/full` -> n8n -> Frontend
 
 ### INTERFAZ DE SUBIDA DE DOCUMENTO
 
-![Upload](docs/images/interfaz_1.jpeg)
+![Upload](docs/images/intefaz%201.jpeg)
 
 ### DASHBOARD DE KPIs
 
-![Orquestador](docs/images/interfaz_9.jpeg)
+![Orquestador](docs/images/intefaz%209.jpeg)
 
 ### ANALISIS DE AGENTES IA - ANALISTA DE MERCADO
 
-![KPIs](docs/images/interfaz_8.jpeg)
+![KPIs](docs/images/intefaz%208.jpeg)
 
 ### MATRIZ DE RIESGO
 
-![Riesgo](docs/images/interfaz_5.jpeg)
+![Riesgo](docs/images/intefaz%205.jpeg)
 
 ### ANALISIS DE AGENTES IA - DATA SCIENCE
-
-![Decisiones](docs/images/interfaz_6.jpeg)
 
 ---
 
