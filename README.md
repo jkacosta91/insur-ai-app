@@ -22,7 +22,7 @@ El valor del sistema depende de la consistencia estructurada del JSON devuelto p
 
 ## Arquitectura General
 
-![Arquitectura](docs/workflow_n8n.jpeg)
+![Arquitectura](docs/images/worflow%20n8n.jpeg)
 
 Flujos soportados:
 
@@ -37,19 +37,19 @@ Frontend/n8n -> FastAPI `/ml/full` -> n8n -> Frontend
 ## Demo Visual
 
 ### Subida de Documento
-![Upload](docs/interfaz_1.jpeg)
+![Upload](docs/images/intefaz%201.jpeg)
 
 ### Orquestacion Multi-Agente
-![Orquestador](docs/interfaz_9.jpeg)
+![Orquestador](docs/images/intefaz%209.jpeg)
 
 ### Dashboard de KPIs
-![KPIs](docs/interfaz_8.jpeg)
+![KPIs](docs/images/intefaz%208.jpeg)
 
 ### Matriz de Riesgo
-![Riesgo](docs/interfaz_5.jpeg)
+![Riesgo](docs/images/intefaz%205.jpeg)
 
 ### Decisiones Prioritarias
-![Decisiones](docs/interfaz_6.jpeg)
+![Decisiones](docs/images/intefaz%206.jpeg)
 
 ---
 
@@ -253,9 +253,10 @@ Si faltan metricas numericas estructuradas, el frontend mostrara KPIs en cero.
 
 El sistema fue probado con los siguientes documentos:
 
-- [PDF Ventas](docs/samples/sample_input_ventas.pdf)
-- [PDF Clientes](docs/samples/sample_input_clientes.pdf)
+- [PDF Ventas](docs/samples/OPERACIONES.pdf)
+- [PDF Clientes](docs/samples/CLIENTES.pdf)
 
 ### Ejemplo de PRD generado
 
-- [PRD Ejecutivo - Ejemplo](docs/samples/sample_prd_output.pdf)
+- [PRD Ejecutivo - Clientes](docs/samples/PRD_Informe_Masivo_Clientes_Sector_Inmobiliario_2026.pdf)
+- [PRD Ejecutivo - Ventas](docs/samples/PRD_Informe_Masivo_Ventas_Sector_Inmobiliario_2026.pdf)
