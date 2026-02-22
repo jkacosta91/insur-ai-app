@@ -20,36 +20,43 @@ El valor del sistema depende de la consistencia estructurada del JSON devuelto p
 
 ---
 
-## Arquitectura General
+## WORKFLOW N8N
 
-![Arquitectura](docs/images/worflow%20n8n.jpeg)
+![Arquitectura](docs/images/workflow_n8n.jpeg)
 
 Flujos soportados:
 
 ### Modo A (operacion recomendada)
+
 Frontend -> n8n -> Frontend
 
 ### Modo B (pipeline ML completo)
+
 Frontend/n8n -> FastAPI `/ml/full` -> n8n -> Frontend
 
 ---
 
 ## Demo Visual
 
-### Subida de Documento
-![Upload](docs/images/intefaz%201.jpeg)
+### INTERFAZ DE SUBIDA DE DOCUMENTO
 
-### Orquestacion Multi-Agente
-![Orquestador](docs/images/intefaz%209.jpeg)
+![Upload](docs/images/interfaz_1.jpeg)
 
-### Dashboard de KPIs
-![KPIs](docs/images/intefaz%208.jpeg)
+### DASHBOARD DE KPIs
 
-### Matriz de Riesgo
-![Riesgo](docs/images/intefaz%205.jpeg)
+![Orquestador](docs/images/interfaz_9.jpeg)
 
-### Decisiones Prioritarias
-![Decisiones](docs/images/intefaz%206.jpeg)
+### ANALISIS DE AGENTES IA - ANALISTA DE MERCADO
+
+![KPIs](docs/images/interfaz_8.jpeg)
+
+### MATRIZ DE RIESGO
+
+![Riesgo](docs/images/interfaz_5.jpeg)
+
+### ANALISIS DE AGENTES IA - DATA SCIENCE
+
+![Decisiones](docs/images/interfaz_6.jpeg)
 
 ---
 
@@ -62,11 +69,11 @@ Frontend/n8n -> FastAPI `/ml/full` -> n8n -> Frontend
 3. n8n ejecuta agentes en paralelo.
 4. Devuelve JSON estructurado.
 5. El frontend adapta el payload y renderiza:
-- Resumen Ejecutivo
-- KPIs y graficos
-- Panel por agente
-- Matriz de riesgo
-- PRD descargable
+   - Resumen Ejecutivo
+   - KPIs y graficos
+   - Panel por agente
+   - Matriz de riesgo
+   - PRD descargable
 
 ### Modo B (Pipeline ML Python)
 
@@ -253,10 +260,10 @@ Si faltan metricas numericas estructuradas, el frontend mostrara KPIs en cero.
 
 El sistema fue probado con los siguientes documentos:
 
-- [PDF Ventas](docs/samples/OPERACIONES.pdf)
-- [PDF Clientes](docs/samples/CLIENTES.pdf)
+- [PDF Ventas](docs/samples/sample_input_ventas.pdf)
+- [PDF Clientes](docs/samples/sample_input_clientes.pdf)
 
 ### Ejemplo de PRD generado
 
-- [PRD Ejecutivo - Clientes](docs/samples/PRD_Informe_Masivo_Clientes_Sector_Inmobiliario_2026.pdf)
-- [PRD Ejecutivo - Ventas](docs/samples/PRD_Informe_Masivo_Ventas_Sector_Inmobiliario_2026.pdf)
+- [PRD Ejecutivo - Clientes](docs/samples/sample_prd_output_clientes.pdf)
+- [PRD Ejecutivo - Ventas](docs/samples/sample_prd_output_ventas.pdf)
